@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">3D Model Viewer</string>
+    <string name="app_version">Version 1.0</string>
+    <string name="action_settings">Settings</string>
+    <!-- Activities -->
+    <string name="title_activity_menu">Menu</string>
+    <string name="title_activity_demo">Demo</string>
+    <string name="title_activity_text">Text</string>
+    <string name="title_activity_model">Model</string>
+    <!-- Demo menu -->
+    <string name="item">item</string>
+
+    <string-array name="menu_items">
+        <item>Load Model</item>
+    </string-array>
+
+    <string name="image">image</string>
+    <!-- Load settings -->
+    <string name="model_name">Model name</string>
+    <string name="texture">Texture</string>
+    <string name="invert_texture_coordinates">Invert texture coordinates</string>
+    <string name="cancel">Cancel</string>
+    <string name="load">Load</string>
+    <string name="load_model">Load Model</string>
+
+    <!-- GL Settings -->
+    <string name="toggle_wireframe">Toggle wireframe</string>
+    <string name="toggle_textures">Toggle textures</string>
+    <string name="toggle_lights">Toggle lights</string>
+    <string name="toggle_boundingbox">Toggle bounding box</string>
+
+    <!-- To review -->
+    <string name="app_logo_desc">Teapot animated logo</string>
+
+</resources>
