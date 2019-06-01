@@ -72,9 +72,6 @@ public class TouchController {
 	}
 
 	public synchronized boolean onTouchEvent(MotionEvent motionEvent) {
-		// MotionEvent reports input details from the touch screen
-		// and other input controls. In this case, you are only
-		// interested in events where the touch position changed.
 
 		switch (motionEvent.getActionMasked()) {
 		case MotionEvent.ACTION_UP:
@@ -82,7 +79,7 @@ public class TouchController {
 		case MotionEvent.ACTION_POINTER_UP:
 		case MotionEvent.ACTION_HOVER_EXIT:
 		case MotionEvent.ACTION_OUTSIDE:
-			// this to handle "1 simple touch"
+
 			if (lastActionTime > SystemClock.uptimeMillis() - 250) {
 				simpleTouch = true;
 			} else {
@@ -137,7 +134,7 @@ public class TouchController {
 			vector[0] /= len;
 			vector[1] /= len;
 
-			// Log.d("Touch", "x1:" + x1 + ",y1:" + y1 + ",x2:" + x2 + ",y2:" + y2);
+
 			if (gestureChanged) {
 				previousX1 = x1;
 				previousY1 = y1;
@@ -173,7 +170,7 @@ public class TouchController {
 				rotation = 360;
 			}
 
-			// gesture detection
+
 			isOneFixedAndOneMoving = ((dx1 + dy1) == 0) != (((dx2 + dy2) == 0));
 			fingersAreClosing = !isOneFixedAndOneMoving && (Math.abs(dx1 + dx2) < 10 && Math.abs(dy1 + dy2) < 10);
 			isRotating = !isOneFixedAndOneMoving && (dx1 != 0 && dy1 != 0 && dx2 != 0 && dy2 != 0)
@@ -181,21 +178,21 @@ public class TouchController {
 		}
 
 		if (pointerCount == 1 && simpleTouch) {
-			// calculate the world coordinates where the user is clicking (near plane and far plane)
+
 			float[] hit1 = unproject(x1, y1, 0);
 			float[] hit2 = unproject(x1, y1, 1);
-			// check if the ray intersect any of our objects and select the nearer
+
 			selectObjectImpl(hit1, hit2);
 		}
 
 
 		int max = Math.max(mRenderer.getWidth(), mRenderer.getHeight());
 		if (touchDelay > 1) {
-			// INFO: Procesar gesto
+
 			if (pointerCount == 1 && currentPress1 > 4.0f) {
 			} else if (pointerCount == 1) {
 				touchStatus = TOUCH_STATUS_MOVING_WORLD;
-				// Log.d("TouchController", "Translating camera (dx,dy) '" + dx1 + "','" + dy1 + "'...");
+
 				dx1 = (float)(dx1 / max * Math.PI * 2);
 				dy1 = (float)(dy1 / max * Math.PI * 2);
 				mRenderer.getCamera().translateCamera(dx1,dy1);
@@ -213,71 +210,7 @@ public class TouchController {
 				}
 			}
 
-			// INFO: Realizamos la acci�n
 			switch (touchStatus) {
-			// case TOUCH_STATUS_ROTATING_OBJECT:
-			// // reverse direction of rotation above the mid-line
-			// if (y > getHeight() / 2) {
-			// // Log.d(TAG, "Reversing dx");
-			// dx = dx * -1;
-			// }
-			//
-			// // reverse direction of rotation to left of the mid-line
-			// if (x < getWidth() / 2) {
-			// // Log.d(TAG, "Reversing dy");
-			// dy = dy * -1;
-			// }
-			// Log.w("Object", "Rotating '" + dx + "','" + dy + "'...");
-			//
-			// if (wzSquare > wzTriangle) {
-			// mRenderer.getmSquare().setRotationZ(mRenderer.getmSquare().getRotationZ() + ((dx + dy) *
-			// TOUCH_SCALE_FACTOR));
-			// } else if (wzTriangle > wzSquare) {
-			// mRenderer.getmTriangle().setRotationZ(mRenderer.getmTriangle().getRotationZ() + ((dx + dy) *
-			// TOUCH_SCALE_FACTOR));
-			// }
-			//
-			// break;
-			//
-			// case TOUCH_STATUS_MOVING_OBJECT:
-			// // TODO: guess front object
-			// boolean sqHit = wzSquare > wzTriangle;
-			// boolean triHit = wzTriangle > wzSquare;
-			// Log.w("Object", "Moving '" + sqHit + "','" + triHit + "'...");
-			//
-			// if (sqHit) {
-			// mRenderer.getmSquare().translateX((dx * mRenderer.getRatio() * 2 / mRenderer.getWidth()) *
-			// TOUCH_MOVE_FACTOR);
-			// mRenderer.getmSquare().translateY((-dy * 1 / mRenderer.getHeight()) * TOUCH_MOVE_FACTOR);
-			// }
-			// if (triHit) {
-			// mRenderer.getmTriangle().translateX((dx * mRenderer.getRatio() * 2 / mRenderer.getWidth()) *
-			// TOUCH_MOVE_FACTOR);
-			// mRenderer.getmTriangle().translateY((-dy * 1 / mRenderer.getHeight()) * TOUCH_MOVE_FACTOR);
-			// }
-			// break;
-			//
-			// case TOUCH_STATUS_ROTATING_OBJECT2:
-			// Log.w("Object", "Rotating '" + wzSquare + "','" + wzTriangle + "'...");
-			// // INFO: We are moving 2 fingers in different directions
-			// // Rotate Camera
-			// // TODO: Rotationfactor deber�a ser proporcional a la z?
-			// if (wzSquare > wzTriangle) {
-			// mRenderer.getmSquare().setRotationZ(mRenderer.getmSquare().getRotationZ() + (actualRotation *
-			// TOUCH_ROTATION_FACTOR));
-			// } else if (wzTriangle > wzSquare) {
-			// mRenderer.getmTriangle().setRotationZ(mRenderer.getmTriangle().getRotationZ() + (actualRotation *
-			// TOUCH_ROTATION_FACTOR));
-			// }
-			// // mRenderer.setAngle(mRenderer.getAngle() + actualRotation
-			// // * TOUCH_ROTATION_FACTOR);
-			//
-			// // mRenderer.getCamera().Rotate(rotation *
-			// // CAMERA_ROTATION_FACTOR,
-			// // 0);
-			//
-			// break;
-
 			}
 		}
 
@@ -301,14 +234,7 @@ public class TouchController {
 
 	}
 
-	/**
-	 * Get the nearest object intersecting the specified ray and selects it
-	 * 
-	 * @param nearPoint
-	 *            the near point in world coordinates
-	 * @param farPoint
-	 *            the far point in world coordinates
-	 */
+
 	private void selectObjectImpl(float[] nearPoint, float[] farPoint) {
 		SceneLoader scene = view.getModelActivity().getScene();
 		if (scene == null) {
@@ -356,15 +282,15 @@ public class TouchController {
 
 class TouchScreen {
 
-	// these matrices will be used to move and zoom image
+
 	private android.graphics.Matrix matrix = new android.graphics.Matrix();
 	private android.graphics.Matrix savedMatrix = new android.graphics.Matrix();
-	// we can be in one of these 3 states
+
 	private static final int NONE = 0;
 	private static final int DRAG = 1;
 	private static final int ZOOM = 2;
 	private int mode = NONE;
-	// remember some things for zooming
+
 	private PointF start = new PointF();
 	private PointF mid = new PointF();
 	private float oldDist = 1f;
@@ -373,7 +299,7 @@ class TouchScreen {
 	private float[] lastEvent = null;
 
 	public boolean onTouch(View v, MotionEvent event) {
-		// handle touch events here
+
 		ImageView view = (ImageView) v;
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
@@ -434,30 +360,21 @@ class TouchScreen {
 		return true;
 	}
 
-	/**
-	 * Determine the space between the first two fingers
-	 */
+
 	private float spacing(MotionEvent event) {
 		float x = event.getX(0) - event.getX(1);
 		float y = event.getY(0) - event.getY(1);
 		return FloatMath.sqrt(x * x + y * y);
 	}
 
-	/**
-	 * Calculate the mid point of the first two fingers
-	 */
+
 	private void midPoint(PointF point, MotionEvent event) {
 		float x = event.getX(0) + event.getX(1);
 		float y = event.getY(0) + event.getY(1);
 		point.set(x / 2, y / 2);
 	}
 
-	/**
-	 * Calculate the degree to be rotated by.
-	 * 
-	 * @param event
-	 * @return Degrees
-	 */
+
 	public static float getRotation(MotionEvent event) {
 		double dx = (event.getX(0) - event.getX(1));
 		double dy = (event.getY(0) - event.getY(1));

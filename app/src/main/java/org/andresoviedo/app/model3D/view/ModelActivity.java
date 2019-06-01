@@ -86,7 +86,7 @@ public class ModelActivity extends Activity {
 
 		// TODO: Alert user when there is no multitouch support (2 fingers). He won't be able to rotate or zoom for
 		// example
-		Utils.printTouchCapabilities(getPackageManager());
+		//Utils.printTouchCapabilities(getPackageManager());
 
 		setupOnSystemVisibilityChangeListener();
 	}
@@ -146,20 +146,8 @@ public class ModelActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.model_toggle_wireframe:
 			scene.toggleWireframe();
-			break;
-		case R.id.model_toggle_boundingbox:
-			scene.toggleBoundingBox();
-			break;
-		case R.id.model_toggle_textures:
-			scene.toggleTextures();
-			break;
-		case R.id.model_toggle_lights:
-			scene.toggleLighting();
-			break;
-		}
+
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -176,9 +164,9 @@ public class ModelActivity extends Activity {
 
 	private void hideSystemUI() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			hideSystemUIKitKat();
+			//hideSystemUIKitKat();
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-			hideSystemUIJellyBean();
+			//hideSystemUIJellyBean();
 		}
 	}
 

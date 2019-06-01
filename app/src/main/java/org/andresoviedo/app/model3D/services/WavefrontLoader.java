@@ -60,16 +60,14 @@ public class WavefrontLoader {
 	private boolean hasTCs3D = false;
 
 	private ArrayList<Tuple3> texCoords;
-	// whether the model uses 3D or 2D tex coords
-	// whether tex coords should be flipped around the y-axis
 
-	private Faces faces; // model faces
-	private FaceMaterials faceMats; // materials used by faces
-	private Materials materials; // materials defined in MTL file
-	private ModelDimensions modelDims; // model dimensions
+	private Faces faces;
+	private FaceMaterials faceMats;
+	private Materials materials; //  MTL file
+	private ModelDimensions modelDims; //
 
-	private String modelNm; // without path or ".OBJ" extension
-	private float maxSize; // for scaling the model
+	private String modelNm; // 路径
+	private float maxSize; //
 
 	// metadata
 	int numVerts = 0;
@@ -78,7 +76,7 @@ public class WavefrontLoader {
 	int numFaces = 0;
 	int numVertsReferences = 0;
 
-	// buffers
+
 	private FloatBuffer vertsBuffer;
 	private FloatBuffer normalsBuffer;
 	// TODO: build texture data directly into this buffer
@@ -96,7 +94,7 @@ public class WavefrontLoader {
 
 		faceMats = new FaceMaterials();
 		modelDims = new ModelDimensions();
-	} // end of initModelData()
+	}
 
 	public FloatBuffer getVerts() {
 		return vertsBuffer;
@@ -126,10 +124,7 @@ public class WavefrontLoader {
 		return modelDims;
 	}
 
-	/**
-	 * Count verts, normals, faces etc and reserve buffers to save the data.
-	 * @param br data source
-	 */
+	//分析模型
 	public void analyzeModel(InputStream is) {
 		int lineNum = 0;
 		String line;
@@ -158,19 +153,19 @@ public class WavefrontLoader {
 							faceSize = line.split(" ").length - 1;
 						}
 						numFaces += (faceSize - 2);
-						// (faceSize-2)x3 = converting polygon to triangles
+						// 将多边形转换为三角形
 						numVertsReferences += (faceSize - 2) * 3;
-					} else if (line.startsWith("mtllib ")) // build material
+					} else if (line.startsWith("mtllib ")) //
 					{
 						materials = new Materials(line.substring(7));
-					} else if (line.startsWith("usemtl ")) {// use material
-					} else if (line.charAt(0) == 'g') { // group name
-						// not implemented
-					} else if (line.charAt(0) == 's') { // smoothing group
-						// not implemented
-					} else if (line.charAt(0) == '#') // comment line
+					} else if (line.startsWith("usemtl ")) {// 使用纹理
+					} else if (line.charAt(0) == 'g') { //
+						//不做计算
+					} else if (line.charAt(0) == 's') { //
+
+					} else if (line.charAt(0) == '#') //
 						continue;
-					else if (line.charAt(0) == 'o') // object group
+					else if (line.charAt(0) == 'o') //
 						continue;
 					else
 						System.out.println("Ignoring line " + lineNum + " : " + line);
@@ -190,8 +185,8 @@ public class WavefrontLoader {
 			}
 		}
 
-		Log.i("WavefrontLoader","Number of vertices:"+numVerts);
-		Log.i("WavefrontLoader","Number of faces:"+numFaces);
+		Log.i("OBJ","顶点数:"+numVerts);
+		Log.i("OBJ","角面数:"+numFaces);
 	}
 
 	/**
@@ -199,7 +194,7 @@ public class WavefrontLoader {
 	 * TODO: use textureCoordsBuffer
 	 */
 	public void allocateBuffers() {
-		// size = 3 (x,y,z) * 4 (bytes per float)
+
 		vertsBuffer = createNativeByteBuffer(numVerts*3*4).asFloatBuffer();
 		normalsBuffer = createNativeByteBuffer(numNormals*3*4).asFloatBuffer();
 		textureCoordsBuffer = createNativeByteBuffer(numTextures*3*4).asFloatBuffer();
@@ -226,17 +221,17 @@ public class WavefrontLoader {
 	}
 
 	private static ByteBuffer createNativeByteBuffer(int length) {
-		// initialize vertex byte buffer for shape coordinates
+		// 初始化形状坐标的顶点字节缓冲区
 		ByteBuffer bb = ByteBuffer.allocateDirect(length);
-		// use the device hardware's native byte order
+		//使用设备硬件的本机字节顺序
 		bb.order(ByteOrder.nativeOrder());
 		return bb;
 	}
 
 	private void readModel(BufferedReader br)
-	// parse the OBJ file line-by-line
+	// 逐行解析OBJ文件
 	{
-		boolean isLoaded = true; // hope things will go okay
+		boolean isLoaded = true; //
 
 		int lineNum = 0;
 		String line;
@@ -254,33 +249,31 @@ public class WavefrontLoader {
 				line = line.trim();
 				if (line.length() > 0) {
 
-					if (line.startsWith("v ")) { // vertex
+					if (line.startsWith("v ")) { // 顶点数据
 						isLoaded = addVert(vertsBuffer, vertNumber++ * 3, line, isFirstCoord, modelDims) && isLoaded;
 						if (isFirstCoord)
 							isFirstCoord = false;
-					} else if (line.startsWith("vt")) { // tex coord
+					} else if (line.startsWith("vt")) { //
 						isLoaded = addTexCoord(line, isFirstTC) && isLoaded;
 						if (isFirstTC)
 							isFirstTC = false;
-					} else if (line.startsWith("vn")) // normal
+					} else if (line.startsWith("vn")) // 法线
 						isLoaded = addVert(normalsBuffer, normalNumber++ * 3,line, isFirstCoord, null) && isLoaded;
-					else if (line.startsWith("f ")) { // face
+					else if (line.startsWith("f ")) { // 面
 						isLoaded = faces.addFace(line) && isLoaded;
 						numFaces++;
-					} else if (line.startsWith("mtllib ")) // build material
+					} else if (line.startsWith("mtllib ")) //
 					{
-						// materials = new Materials(new File(modelFile.getParent(),
-						// line.substring(7)).getAbsolutePath());
-						// materials = new Materials(line.substring(7));
+
 					} else if (line.startsWith("usemtl ")) // use material
 						faceMats.addUse(numFaces, line.substring(7));
-					else if (line.charAt(0) == 'g') { // group name
-						// not implemented
-					} else if (line.charAt(0) == 's') { // smoothing group
-						// not implemented
-					} else if (line.charAt(0) == '#') // comment line
+					else if (line.charAt(0) == 'g') { //
+
+					} else if (line.charAt(0) == 's') { //
+
+					} else if (line.charAt(0) == '#') //
 						continue;
-					else if (line.charAt(0) == 'o') // object group
+					else if (line.charAt(0) == 'o') //
 						continue;
 					else
 						System.out.println("Ignoring line " + lineNum + " : " + line);
@@ -298,19 +291,19 @@ public class WavefrontLoader {
 	} // end of readModel()
 
 	/**
-	 * Parse the vertex and add it to the buffer. If the vertex cannot be parsed,
-	 * then a default (0,0,0) vertex is added instead.
+	 * 解析顶点并将其添加到缓冲区。如果顶点不能被解析 默认（0,0,0）
 	 *
-	 * @param buffer the buffer where the vertex is to be added
-	 * @param offset the offset of the buffer
-	 * @param line the vertex to parse
-	 * @param isFirstCoord if this is the first vertex to be parsed
-	 * @param dimensions the model dimesions so they are updated (TODO move this out of this method)
-	 * @return <code>true</code> if the vertex could be parsed, <code>false</code> otherwise
+	 *
+	 * @param buffer 要添加顶点的缓冲区
+	 * @param offset 缓冲区的偏移量
+	 * @param line 要解析的顶点
+	 * @param isFirstCoord 如果这是第一个被解析的顶点
+	 * @param dimensions 模型显示，以便更新 (TODO move this out of this method)
+	 * @return <
 	 */
 	private boolean addVert(FloatBuffer buffer, int offset, String line, boolean isFirstCoord, ModelDimensions dimensions)
 	/*
-	 * Add vertex from line "v x y z" to vert ArrayList, and update the model dimension's info.
+	 * 将Vertex从行“V X Y Z”添加到VERT查询列表中，并更新模型维度的信息
 	 */
 	{
 		float x=0,y=0,z=0;
@@ -338,17 +331,17 @@ public class WavefrontLoader {
 		}catch(NumberFormatException ex){
 			Log.e("WavefrontLoader",ex.getMessage());
 		} finally{
-			// try to build even with errors
+
 			buffer.put(offset, x).put(offset+1, y).put(offset+2, z);
 		}
 
 		return false;
-	} // end of addVert()
+	}
 
 	private boolean addTexCoord(String line, boolean isFirstTC)
 	/*
-	 * Add the texture coordinate from the line "vt u v w" to the texCoords ArrayList. There may only be two tex coords
-	 * on the line, which is determined by looking at the first tex coord line.
+	 * 将“VT U V W”行中的纹理坐标添加到texcocorylist中.
+	 * 在线上，这是通过查看第一条Tex coord线来确定的
 	 */
 	{
 		if (isFirstTC) {
@@ -363,25 +356,25 @@ public class WavefrontLoader {
 		}
 
 		return false;
-	} // end of addTexCoord()
+	}
 
 	private boolean checkTC3D(String line)
 	/*
-	 * Check if the line has 4 tokens, which will be the "vt" token and 3 tex coords in this case.
+	 *检查模型数据
 	 */
 	{
 		String[] tokens = line.split("\\s+");
 		return (tokens.length == 4);
-	} // end of checkTC3D()
+	}
 
 	private Tuple3 readTCTuple(String line)
 	/*
-	 * The line starts with a "vt" OBJ word and two or three floats (x, y, z) for the tex coords separated by spaces. If
-	 * there are only two coords, then the z-value is assigned a dummy value, DUMMY_Z_TC.
+	 * 该行以“vt”OBJ字开头，两个或三个浮点数（x，y，z）用于由空格分隔的tex坐标
+	 * 如果只有两个坐标，则为z值分配一个虚拟值DUMMY_Z_TC。
 	 */
 	{
 		StringTokenizer tokens = new StringTokenizer(line, " ");
-		tokens.nextToken(); // skip "vt" OBJ word
+		tokens.nextToken(); //
 
 		try {
 			float x = Float.parseFloat(tokens.nextToken());
@@ -396,7 +389,7 @@ public class WavefrontLoader {
 		}
 
 		return null; // means an error occurred
-	} // end of readTCTuple()
+	}
 
 	public void reportOnModel() {
 		Log.i("WavefrontLoader","No. of vertices: " + vertsBuffer.capacity()/3);
@@ -405,13 +398,13 @@ public class WavefrontLoader {
 		Log.i("WavefrontLoader","No. of faces: " + faces.getSize());
 
 		modelDims.reportDimensions();
-		// dimensions of model (before centering and scaling)
+		// 模型尺寸（居中和缩放前）
 
 		if (materials != null)
 			materials.showMaterials(); // list defined materials
 		faceMats.showUsedMaterials(); // show what materials have been used by
 		// faces
-	} // end of reportOnModel()
+	} //
 
 	public static class Tuple3 {
 		private float x, y, z;
@@ -450,7 +443,7 @@ public class WavefrontLoader {
 			return z;
 		}
 
-	} // end of Tuple3 class
+	} //
 
 	public static class ModelDimensions {
 		// edge coordinates
@@ -468,7 +461,7 @@ public class WavefrontLoader {
 			bottomPt = 0.0f;
 			farPt = 0.0f;
 			nearPt = 0.0f;
-		} // end of ModelDimensions()
+		} //
 
 		public void set(float x, float y, float z)
 		// initialize the model's edge coordinates
@@ -484,7 +477,7 @@ public class WavefrontLoader {
 		} // end of set()
 
 		public void update(float x, float y, float z)
-		// update the edge coordinates using vert
+		//使用vert更新边缘坐标
 		{
 			if (x > rightPt)
 				rightPt = x;
@@ -502,7 +495,6 @@ public class WavefrontLoader {
 				farPt = z;
 		} // end of update()
 
-		// ------------- use the edge coordinates ----------------------------
 
 		public float getWidth() {
 			return (rightPt - leftPt);
@@ -527,14 +519,14 @@ public class WavefrontLoader {
 				largest = depth;
 
 			return largest;
-		} // end of getLargest()
+		}
 
 		public Tuple3 getCenter() {
 			float xc = (rightPt + leftPt) / 2.0f;
 			float yc = (topPt + bottomPt) / 2.0f;
 			float zc = (nearPt + farPt) / 2.0f;
 			return new Tuple3(xc, yc, zc);
-		} // end of getCenter()
+		} //
 
 		public void reportDimensions() {
 			Tuple3 center = getCenter();
@@ -547,21 +539,21 @@ public class WavefrontLoader {
 
 			System.out.println("z Coords: " + df.format(nearPt) + " to " + df.format(farPt));
 			System.out.println("  Mid: " + df.format(center.getZ()) + "; Depth: " + df.format(getDepth()));
-		} // end of reportDimensions()
+		} //
 
-	} // end of ModelDimensions class
+	} //
 
 	public static class Materials {
 
 		public Map<String, Material> materials;
-		// stores the Material objects built from the MTL file data
+		// 存储从MTL文件数据构建的Material对象
 
-		// private File file;
+		//
 		private String mfnm;
 
 		public Materials(String mtlFnm) {
-			// TODO: this map is now linked because we want to get only the first texture
-			// when multiple textures are supported, change this to be a simple HashMap
+			//
+			//当支持多个纹理时，将其更改为简单的HashMap
 			materials = new LinkedHashMap<String, Material>();
 
 			this.mfnm = mtlFnm;
@@ -589,53 +581,53 @@ public class WavefrontLoader {
 				Log.e("WavefrontLoader", e.getMessage(), e);
 			}
 
-		} // end of Materials()
+		} //
 
 		private void readMaterials(BufferedReader br)
 		/*
-		 * Parse the MTL file line-by-line, building Material objects which are collected in the materials ArrayList.
+		 * 逐行解析MTL文件，构建材料ArrayList中收集的Material对象。
 		 */
 		{
 			Log.v("materials", "Reading material...");
 			try {
 				String line;
-				Material currMaterial = null; // current material
+				Material currMaterial = null; //
 
 				while (((line = br.readLine()) != null)) {
 					line = line.trim();
 					if (line.length() == 0)
 						continue;
 
-					if (line.startsWith("newmtl ")) { // new material
-						if (currMaterial != null) // save previous material
+					if (line.startsWith("newmtl ")) { //
+						if (currMaterial != null) //
 							materials.put(currMaterial.getName(), currMaterial);
 
-						// start collecting info for new material
+						// 开始存储新材质的信息
 						String name = line.substring(7);
 						Log.d("Loader", "New material found: " + name);
 						currMaterial = new Material(name);
 					} else if (line.startsWith("map_Kd ")) { // texture filename
-						// String fileName = new File(file.getParent(), line.substring(7)).getAbsolutePath();
+						//
 						String textureFilename = line.substring(7);
 						Log.d("Loader", "New texture found: " + textureFilename);
 						currMaterial.setTexture(textureFilename);
-					} else if (line.startsWith("Ka ")) // ambient colour
+					} else if (line.startsWith("Ka ")) //
 						currMaterial.setKa(readTuple3(line));
-					else if (line.startsWith("Kd ")) // diffuse colour
+					else if (line.startsWith("Kd ")) //
 						currMaterial.setKd(readTuple3(line));
-					else if (line.startsWith("Ks ")) // specular colour
+					else if (line.startsWith("Ks ")) //
 						currMaterial.setKs(readTuple3(line));
-					else if (line.startsWith("Ns ")) { // shininess
+					else if (line.startsWith("Ns ")) { //
 						float val = Float.valueOf(line.substring(3)).floatValue();
 						currMaterial.setNs(val);
-					} else if (line.charAt(0) == 'd') { // alpha
+					} else if (line.charAt(0) == 'd') { //
 						float val = Float.valueOf(line.substring(2)).floatValue();
 						currMaterial.setD(val);
-					} else if (line.startsWith("Tr ")) { // Transparency (inverted)
+					} else if (line.startsWith("Tr ")) { //
 						float val = Float.valueOf(line.substring(3)).floatValue();
 						currMaterial.setD(1 - val);
-					} else if (line.startsWith("illum ")) { // illumination model
-						// not implemented
+					} else if (line.startsWith("illum ")) { //
+
 					} else if (line.charAt(0) == '#') // comment line
 						continue;
 					else
@@ -648,11 +640,11 @@ public class WavefrontLoader {
 			} catch (Exception e) {
 				Log.e("materials", e.getMessage(), e);
 			}
-		} // end of readMaterials()
+		} //
 
 		private Tuple3 readTuple3(String line)
 		/*
-		 * The line starts with an MTL word such as Ka, Kd, Ks, and the three floats (x, y, z) separated by spaces
+		 * 该行以MTL字开头，例如Ka，Kd，Ks，以及由空格分隔的三个浮点数（x，y，z）
 		 */
 		{
 			StringTokenizer tokens = new StringTokenizer(line, " ");
@@ -668,11 +660,11 @@ public class WavefrontLoader {
 				System.out.println(e.getMessage());
 			}
 
-			return null; // means an error occurred
-		} // end of readTuple3()
+			return null; //
+		} //
 
 		public void showMaterials()
-		// list all the Material objects
+		// 列出所有Material对象
 		{
 			Log.i("WavefrontLoader","No. of materials: " + materials.size());
 			Material m;
@@ -681,23 +673,23 @@ public class WavefrontLoader {
 				m.showMaterial();
 				// System.out.println();
 			}
-		} // end of showMaterials()
+		} //
 
 		public Material getMaterial(String name) {
 			return materials.get(name);
 		}
 
-	} // end of Materials class
+	} //
 
 	public static class Material {
 		private String name;
 
-		// colour info
-		private Tuple3 ka, kd, ks; // ambient, diffuse, specular colours
-		private float ns; // shininess
-		private float d; // alpha
+		//
+		private Tuple3 ka, kd, ks; //
+		private float ns; //
+		private float d; //
 
-		// texture info
+		//
 		private String texFnm;
 		private String texture;
 
@@ -712,7 +704,7 @@ public class WavefrontLoader {
 
 			texFnm = null;
 			texture = null;
-		} // end of Material()
+		} //
 
 		public void showMaterial() {
 			System.out.println(name);
@@ -728,13 +720,13 @@ public class WavefrontLoader {
 				System.out.println("  d: " + d);
 			if (texFnm != null)
 				System.out.println("  Texture file: " + texFnm);
-		} // end of showMaterial()
+		} //
 
 		public boolean hasName(String nm) {
 			return name.equals(nm);
 		}
 
-		// --------- set/get methods for colour info --------------
+
 
 		public void setD(float val) {
 			d = val;
@@ -784,31 +776,12 @@ public class WavefrontLoader {
 		}
 
 		public void setMaterialColors(GLES20 gl)
-		// start rendering using this material's colour information
+		//使用此材质的颜色信息开始渲染
 		{
-			// if (ka != null) { // ambient color
-			// float[] colorKa = {ka.getX(), ka.getY(), ka.getZ(), 1.0f};
-			// gl.glMaterialfv(GLES20.GL_FRONT_AND_BACK, GLES20.GL_AMBIENT, colorKa, 0);
-			// }
-			// if (kd != null) { // diffuse color
-			// float[] colorKd = {kd.getX(), kd.getY(), kd.getZ(), 1.0f};
-			// gl.glMaterialfv(GLES20.GL_FRONT_AND_BACK, GLES20.GL_DIFFUSE, colorKd, 0);
-			// }
-			// if (ks != null) { // specular color
-			// float[] colorKs = {ks.getX(), ks.getY(), ks.getZ(), 1.0f};
-			// gl.glMaterialfv(GLES20.GL_FRONT_AND_BACK, GLES20.GL_SPECULAR, colorKs, 0);
-			// }
-			//
-			// if (ns != 0.0f) { // shininess
-			// gl.glMaterialf(GLES20.GL_FRONT_AND_BACK, GLES20.GL_SHININESS, ns);
-			// }
-			//
-			// if (d != 1.0f) { // alpha
-			// // not implemented
-			// }
-		} // end of setMaterialColors()
 
-		// --------- set/get methods for texture info --------------
+		} //
+
+		// ---------设置/获取纹理信息的方法 --------------
 
 		public void setTexture(String t) {
 			texture = t;
@@ -822,36 +795,36 @@ public class WavefrontLoader {
 			return name;
 		}
 
-	} // end of Material class
+	} //
 
 	public class Faces {
 		private static final float DUMMY_Z_TC = -5.0f;
 
 		public final int totalFaces;
 		/**
-		 * indices for verticesused by each face
+		 * 每个面使用的顶点的索引
 		 */
 		public IntBuffer facesVertIdxs;
 		/**
-		 * indices for tex coords used by each face
+		 * 每个面使用的tex坐标的索引
 		 */
 		public ArrayList<int[]> facesTexIdxs;
 		/**
-		 * indices for normals used by each face
+		 * 每个面使用的法线的索引
 		 */
 		public ArrayList<int[]> facesNormIdxs;
 
 		private FloatBuffer normals;
 		private ArrayList<Tuple3> texCoords;
 
-		// Total number of vertices references. That is, each face references 3 or more vectors. This is the sum for all
+		// 顶点引用的总数。也就是说，每个面引用3个或更多个向量。这是所有数据总和
 		// faces
 		private int facesLoadCounter;
 		private int faceVertexLoadCounter = 0;
 		private int verticesReferencesCount;
 
-		// for reporting
-		// private DecimalFormat df = new DecimalFormat("0.##"); // 2 dp
+		//
+		//
 
 		Faces(int totalFaces, IntBuffer buffer, FloatBuffer vs, FloatBuffer ns, ArrayList<Tuple3> ts) {
 			this.totalFaces = totalFaces;
@@ -861,25 +834,22 @@ public class WavefrontLoader {
 			facesVertIdxs = buffer;
 			facesTexIdxs = new ArrayList<int[]>();
 			facesNormIdxs = new ArrayList<int[]>();
-		} // end of Faces()
-
+		} //
 		public int getSize(){
 			return totalFaces;
 		}
 
-		/**
-		 * @return <code>true</code> if all faces are loaded
-		 */
+
 		public boolean loaded(){
 			return facesLoadCounter == totalFaces;
 		}
 
 		/**
-		 * get this face's indicies from line "f v/vt/vn ..." with vt or vn index values perhaps being absent.
+		 * 从“f v / vt / vn ...”行得到这个面部的指示，其中vt或vn索引值可能不存在。
 		 */
 		public boolean addFace(String line) {
 			try {
-				line = line.substring(2); // skip the "f "
+				line = line.substring(2); //
 				String[] tokens = null;
 				if (line.contains("  ")){
 					tokens = line.split(" +");
@@ -887,8 +857,8 @@ public class WavefrontLoader {
 				else{
 					tokens = line.split(" ");
 				}
-				int numTokens = tokens.length; // number of v/vt/vn tokens
-				// create arrays to hold the v, vt, vn indicies
+				int numTokens = tokens.length; //
+				// 创建数组以保存v，vt，vn标记
 
 				int vt[] = null;
 				int vn[] = null;
@@ -896,9 +866,9 @@ public class WavefrontLoader {
 
 				for (int i = 0, faceIndex = 0; i < numTokens; i++, faceIndex++) {
 
-					// convert to triangles all polygons
+					// 所有多边形转换为三角形
 					if (faceIndex > 2){
-						// Converting polygon to triangle
+						// 将多边形转换为三角形
 						faceIndex = 0;
 
 						facesLoadCounter++;
@@ -912,26 +882,25 @@ public class WavefrontLoader {
 						i -= 2;
 					}
 
-					// convert to triangles all polygons
+					// 将所有多边形转换为三角形
 					String faceToken = null;
 					if (WavefrontLoader.this.triangleMode == GLES20.GL_TRIANGLE_FAN) {
 						if (faceIndex == 0){
-							// In FAN mode all faces shares the initial vertex
-							faceToken = tokens[0];// get a v/vt/vn
+							//在FAN模式下，所有面都共享初始顶点
+							faceToken = tokens[0];//
 						}else{
-							faceToken = tokens[i]; // get a v/vt/vn
+							faceToken = tokens[i]; //
 						}
 					}
 					else {
 						// GL.GL_TRIANGLES | GL.GL_TRIANGLE_STRIP
-						faceToken = tokens[i]; // get a v/vt/vn
+						faceToken = tokens[i]; //
 					}
-					// token
-					// System.out.println(faceToken);
+
 
 					String[] faceTokens = faceToken.split("/");
-					int numSeps = faceTokens.length; // how many '/'s are there in
-					// the token
+					int numSeps = faceTokens.length; //
+					//
 
 					int vertIdx = Integer.parseInt(faceTokens[0]);
 					/*if (vertIdx > 65535){
@@ -954,15 +923,16 @@ public class WavefrontLoader {
 							vn[faceIndex] = 0;
 						}
 					}
-					// add 0's if the vt or vn index values are missing;
-					// 0 is a good choice since real indices start at 1
+					//
+					//如果缺少vt或vn索引值，则添加0;
+					//实际指数从1开始
 
 					if (WavefrontLoader.INDEXES_START_AT_1) {
 						vertIdx--;
 						if (vt != null)	vt[faceIndex] = vt[faceIndex] - 1;
 						if (vn != null) vn[faceIndex] = vn[faceIndex] - 1;
 					}
-					// store the indices for this face
+					// 存储面的索引
 					facesVertIdxs.put(faceVertexLoadCounter++,vertIdx);
 				}
 				if (vt != null)  facesTexIdxs.add(vt);
@@ -980,41 +950,41 @@ public class WavefrontLoader {
 
 
 		public int getVerticesReferencesCount() {
-			// we have only triangles
+			// 只有三角形
 			return getSize()*3;
 		}
 
 		public IntBuffer getIndexBuffer(){return facesVertIdxs;}
 
-	} // end of Faces class
+	} //
 
 	public static class FaceMaterials {
-		// the face index (integer) where a material is first used
+		// 首先使用材料的面索引（整数）
 		private HashMap<Integer, String> faceMats;
 
-		// for reporting
+		//
 		private HashMap<String, Integer> matCount;
 
-		// how many times a material (string) is used
+		// 使用材料（字符串）的次数
 
 		public FaceMaterials() {
 			faceMats = new HashMap<Integer, String>();
 			matCount = new HashMap<String, Integer>();
-		} // end of FaceMaterials()
+		} //
 
 		public void addUse(int faceIdx, String matName) {
-			// store the face index and the material it uses
-			if (faceMats.containsKey(faceIdx)) // face index already present
+			// 存储面索引及其使用的材质
+			if (faceMats.containsKey(faceIdx)) // 面的参数数已经存在
 				System.out.println("Face index " + faceIdx + " changed to use material " + matName);
 			faceMats.put(faceIdx, matName);
 
-			// store how many times matName has been used by faces
+			// 存储face使用matName的次数
 			if (matCount.containsKey(matName)) {
 				int i = (Integer) matCount.get(matName) + 1;
 				matCount.put(matName, i);
 			} else
 				matCount.put(matName, 1);
-		} // end of addUse()
+		} //
 
 		public String findMaterial(int faceIdx) {
 			return (String) faceMats.get(faceIdx);
@@ -1022,16 +992,16 @@ public class WavefrontLoader {
 
 		public void showUsedMaterials()
 		/*
-		 * List all the materials used by faces, and the number of faces that have used them.
+		 * 列出面使用的所有材质以及使用它们的面数。
 		 */
 		{
 			System.out.println("No. of materials used: " + faceMats.size());
 
-			// build an iterator of material names
+			// 构建材质名称的迭代器
 			Set<String> keys = matCount.keySet();
 			Iterator<String> iter = keys.iterator();
 
-			// cycle through the hashmap showing the count for each material
+			// 循环显示散列图，显示每种材料的计数
 			String matName;
 			int count;
 			while (iter.hasNext()) {
@@ -1041,12 +1011,12 @@ public class WavefrontLoader {
 				System.out.print(matName + ": " + count);
 				System.out.println();
 			}
-		} // end of showUsedMaterials()
+		} //
 
 		public boolean isEmpty() {
 			return faceMats.isEmpty() || this.matCount.isEmpty();
 		}
 
-	} // end of FaceMaterials class
+	}
 
-} // end of WavefrontLoader class
+}

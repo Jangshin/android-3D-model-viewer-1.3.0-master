@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    //noinspection GradleCompatible
     compileSdkVersion 19
     buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "org.andresoviedo.dddmodel2"
         minSdkVersion 8
-        targetSdkVersion 19
+        targetSdkVersion 28
     }
 
     signingConfigs {
@@ -25,6 +26,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             signingConfig signingConfigs.release
         }
+    }
+    compileOptions {
+        sourceCompatibility = '1.7'
+        targetCompatibility = '1.7'
     }
 }
 

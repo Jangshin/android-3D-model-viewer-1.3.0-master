@@ -18,13 +18,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/dialog_load_model_texture"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/texture"
-            android:textSize="14sp" />
+
 
         <Button
             android:id="@+id/browse_texture_button"
@@ -33,19 +27,13 @@
             android:text="..." />
     </LinearLayout>
 
-    <CheckBox
-        android:id="@+id/dialog_load_model_invert_textures"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/invert_texture_coordinates"
-        android:textSize="14sp" />
 
     <Button
         android:id="@+id/dialog_load_model_load"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="@string/load_model"
+        android:text="load_model"
         android:textSize="14sp" />
 
 </LinearLayout>

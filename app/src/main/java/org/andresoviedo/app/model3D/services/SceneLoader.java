@@ -16,66 +16,35 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
-/**
- * This class loads a 3D scena as an example of what can be done with the app
- * 
- * @author andresoviedo
- *
- */
+
 public class SceneLoader {
 
-	/**
-	 * Default model color: yellow
-	 */
+
 	private static float[] DEFAULT_COLOR = {1.0f, 1.0f, 0, 1.0f};
-	/**
-	 * Parent component
-	 */
+
 	protected final ModelActivity parent;
-	/**
-	 * List of data objects containing info for building the opengl objects
-	 */
+
 	private List<Object3DData> objects = new ArrayList<Object3DData>();
-	/**
-	 * Whether to draw objects as wireframes
-	 */
+
 	private boolean drawWireframe = false;
-	/**
-	 * Whether to draw using points
-	 */
+
 	private boolean drawingPoints = false;
-	/**
-	 * Whether to draw bounding boxes around objects
-	 */
+
 	private boolean drawBoundingBox = false;
-	/**
-	 * Whether to draw face normals. Normally used to debug models
-	 */
+
 	private boolean drawNormals = false;
-	/**
-	 * Whether to draw using textures
-	 */
+
 	private boolean drawTextures = true;
-	/**
-	 * Light toggle feature: we have 3 states: no light, light, light + rotation
-	 */
-	private boolean rotatingLight = true;
-	/**
-	 * Light toggle feature: whether to draw using lights
-	 */
-	private boolean drawLighting = true;
-	/**
-	 * Object selected by the user
-	 */
+
+	private boolean rotatingLight = false;
+
+	private boolean drawLighting = false;
+
 	private Object3DData selectedObject = null;
-	/**
-	 * Initial light position
-	 */
+
 	private float[] lightPosition = new float[]{0, 0, 3, 1};
 
-	/**
-	 * Light bulb 3d data
-	 */
+
 	private final Object3DData lightPoint = Object3DBuilder.buildPoint(new float[4]).setId("light").setPosition(lightPosition);
 
 	public SceneLoader(ModelActivity main) {
@@ -84,15 +53,14 @@ public class SceneLoader {
 
 	public void init() {
 
-		// Load object
 		if (parent.getParamFile() != null || parent.getParamAssetDir() != null) {
 
-			// Initialize assets url handler
+			//
+			//初始化assert url处理程序
 			Handler.assets = parent.getAssets();
-			// Handler.classLoader = parent.getClassLoader(); (optional)
-			// Handler.androidResources = parent.getResources(); (optional)
 
-			// Create asset url
+
+			// 创建地址
 			final URL url;
 			try {
 				if (parent.getParamFile() != null) {
@@ -147,9 +115,6 @@ public class SceneLoader {
 		return lightPoint;
 	}
 
-	/**
-	 * Hook for animating the objects before the rendering
-	 */
 	public void onDrawFrame(){
 		animateLight();
 	}
@@ -157,7 +122,6 @@ public class SceneLoader {
 	private void animateLight() {
 		if (!rotatingLight) return;
 
-		// animate light - Do a complete rotation every 5 seconds.
 		long time = SystemClock.uptimeMillis() % 5000L;
 		float angleInDegrees = (360.0f / 5000.0f) * ((int) time);
 		lightPoint.setRotationY(angleInDegrees);
@@ -182,14 +146,14 @@ public class SceneLoader {
 		if (this.drawWireframe && !this.drawingPoints) {
 			this.drawWireframe = false;
 			this.drawingPoints = true;
-			makeToastText("Points", Toast.LENGTH_SHORT);
+			makeToastText("点", Toast.LENGTH_SHORT);
 		}
 		else if (this.drawingPoints){
 			this.drawingPoints = false;
-			makeToastText("Faces", Toast.LENGTH_SHORT);
+			makeToastText("面", Toast.LENGTH_SHORT);
 		}
 		else {
-			makeToastText("Wireframe", Toast.LENGTH_SHORT);
+			makeToastText("网格", Toast.LENGTH_SHORT);
 			this.drawWireframe = true;
 		}
 		requestRender();
@@ -221,20 +185,7 @@ public class SceneLoader {
 	}
 
 	public void toggleLighting() {
-		if (this.drawLighting && this.rotatingLight){
-			this.rotatingLight = false;
-			makeToastText("Light stopped", Toast.LENGTH_SHORT);
-		}
-		else if (this.drawLighting && !this.rotatingLight){
-			this.drawLighting = false;
-			makeToastText("Lightsoff", Toast.LENGTH_SHORT);
-		}
-		else {
-			this.drawLighting = true;
-			this.rotatingLight = true;
-			makeToastText("Light on", Toast.LENGTH_SHORT);
-		}
-		requestRender();
+
 	}
 
 	public boolean isDrawTextures() {
