@@ -21,45 +21,31 @@ import java.net.URL;
  */
 public abstract class LoaderTask extends AsyncTask<Void, Integer, Object3DData> {
 
-	/**
-	 * URL to the 3D model
-	 */
+
 	protected final URL url;
-	/**
-	 * Callback to notify of events
-	 */
+
 	protected final Object3DBuilder.Callback callback;
 	/**
-	 * The dialog that will show the progress of the loading
+	 * 将显示加载进度的对话框
 	 */
 	protected final ProgressDialog dialog;
-	/**
-	 * The parent activity
-	 */
+
 	private final Activity parent;
-	/**
-	 * Directory where the model is located (null when its loaded from asset)
-	 */
+
 	private final File currentDir;
-	/**
-	 * Asset directory where the model is loaded (null when its loaded from the filesystem)
-	 */
+
 	private final String assetsDir;
-	/**
-	 * Id of the data being loaded
-	 */
+
 	private final String modelId;
-	/**
-	 * Exception when loading data (if any)
-	 */
+
 	protected Exception error;
 
 	/**
-	 * Build a new progress dialog for loading the data model asynchronously
+	 * 构建一个新的进度对话框，用于异步加载数据模型
 	 *
-	 * @param url        the URL pointing to the 3d model
-	 * @param currentDir the directory where the model is located (null when the model is an asset)
-	 * @param modelId    the id the data being loaded
+	 * @param url        指向3d模型的URL
+	 * @param currentDir 模型所在的目录（当模型是assert时为null）
+	 * @param modelId    正在加载的数据的id
 	 */
 	public LoaderTask(Activity parent, URL url, File currentDir, String assetsDir, String modelId, Object3DBuilder.Callback callback) {
 		this.parent = parent;
@@ -75,8 +61,6 @@ public abstract class LoaderTask extends AsyncTask<Void, Integer, Object3DData> 
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		// this.dialog = ProgressDialog.show(this.parent, "Please wait ...", "Loading model data...", true);
-		// this.dialog.setTitle(modelId);
 		this.dialog.setMessage("Loading...");
 		this.dialog.setCancelable(false);
 		this.dialog.show();
@@ -121,7 +105,7 @@ public abstract class LoaderTask extends AsyncTask<Void, Integer, Object3DData> 
 				this.dialog.setMessage("构造3D模型...");
 				break;
 			case 5:
-				// Toast.makeText(parent, modelId + " Build!", Toast.LENGTH_LONG).show();
+
 				break;
 		}
 	}

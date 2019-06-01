@@ -27,40 +27,41 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 
 	private final static String TAG = ModelRenderer.class.getName();
 
-	// 3D window (parent component)
+	//3D窗口（父组件）
 	private ModelSurfaceView main;
-	// width of the screen
+	// 屏幕宽度
 	private int width;
-	// height of the screen
+	//
+	//屏幕高度
 	private int height;
-	// Out point of view handler
+	// 出点的处理程序
 	private Camera camera;
-	// frustrum - nearest pixel
+	//
 	private float near = 1f;
-	// frustrum - fartest pixel
+	//
 	private float far = 10f;
 
 	private Object3DBuilder drawer;
-	// The wireframe associated shape (it should be made of lines only)
+	// 线框相关的形状（它应该只由线组成）
 	private Map<Object3DData, Object3DData> wireframes = new HashMap<Object3DData, Object3DData>();
-	// The loaded textures
+	// 加载的纹理
 	private Map<byte[], Integer> textures = new HashMap<byte[], Integer>();
-	// The corresponding opengl bounding boxes and drawer
+	// 相应的opengl边框
 	private Map<Object3DData, Object3DData> boundingBoxes = new HashMap<Object3DData, Object3DData>();
-	// The corresponding opengl bounding boxes
+	// 相应的opengl边界框
 	private Map<Object3DData, Object3DData> normals = new HashMap<Object3DData, Object3DData>();
 
-	// 3D matrices to project our 3D world
+	// 投影3D世界的3D矩阵
 	private final float[] modelProjectionMatrix = new float[16];
 	private final float[] modelViewMatrix = new float[16];
-	// mvpMatrix is an abbreviation for "Model View Projection Matrix"
+	// “模型视图投影矩阵”
 	private final float[] mvpMatrix = new float[16];
 
-	// light position required to render with lighting
+	// 灯光渲染所需的灯光位置
 	private final float[] lightPosInEyeSpace = new float[4];
 
 	/**
-	 * Construct a new renderer for the specified surface view
+	 * 为指定的曲面视图构造一个新的渲染器
 	 *
 	 * @param modelSurfaceView
 	 *            the 3D window
@@ -79,25 +80,26 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 
 	@Override
 	public void onSurfaceCreated(GL10 unused, EGLConfig config) {
-		// Set the background frame color
+
 		//float[] backgroundColor = main.getModelActivity().getBackgroundColor();
 		GLES20.glClearColor(1.0f,1.0f,1.0f,1.0f);
 
-		// Use culling to remove back faces.
-		// Don't remove back faces so we can see them
+
+		//使用剔除去除背面。
+         //不要移除背面，以便可以看到它们
 		// GLES20.glEnable(GLES20.GL_CULL_FACE);
 
-		// Enable depth testing for hidden-surface elimination.
+		// 启用隐藏表面消除的深度测试。
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
-		// Enable blending for combining colors when there is transparency
+		// 当有透明度时，启用混合以组合颜色
 		GLES20.glEnable(GLES20.GL_BLEND);
 		GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
-		// Lets create our 3D world components
+		// 创建3D世界组件
 		camera = new Camera();
 
-		// This component will draw the actual models using OpenGL
+		//该组件将使用OpenGL绘制实际模型
 		drawer = new Object3DBuilder();
 	}
 
@@ -106,30 +108,31 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 		this.width = width;
 		this.height = height;
 
-		// Adjust the viewport based on geometry changes, such as screen rotation
+		//根据几何体更改（例如屏幕旋转）调整视口
 		GLES20.glViewport(0, 0, width, height);
 
-		// INFO: Set the camera position (View matrix)
-		// The camera has 3 vectors (the position, the vector where we are looking at, and the up position (sky)
+		//
+		//信息：设置摄像机位置（视图矩阵）
+		// 相机有3个矢量（位置，视角矢量，以及向上视角）
 		Matrix.setLookAtM(modelViewMatrix, 0, camera.xPos, camera.yPos, camera.zPos, camera.xView, camera.yView,
 				camera.zView, camera.xUp, camera.yUp, camera.zUp);
 
-		// the projection matrix is the 3D virtual space (cube) that we want to project
+		// 投影矩阵是我们想要投影的3D虚拟空间（立方体）
 		float ratio = (float) width / height;
 		Log.d(TAG, "projection: [" + -ratio + "," + ratio + ",-1,1]-near/far[1,10]");
 		Matrix.frustumM(modelProjectionMatrix, 0, -ratio, ratio, -1, 1, getNear(), getFar());
 
-		// Calculate the projection and view transformation
+		// 计算投影和视图转换
 		Matrix.multiplyMM(mvpMatrix, 0, modelProjectionMatrix, 0, modelViewMatrix, 0);
 	}
 
 	@Override
 	public void onDrawFrame(GL10 unused) {
 
-		// Draw background color
+		//背景颜色
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-		// recalculate mvp matrix according to where we are looking at now
+		// 根据我们现在看到的位置重新计算mvp矩阵
 		if (camera.hasChanged()) {
 			Matrix.setLookAtM(modelViewMatrix, 0, camera.xPos, camera.yPos, camera.zPos, camera.xView, camera.yView,
 					camera.zView, camera.xUp, camera.yUp, camera.zUp);
@@ -140,28 +143,29 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 
 		SceneLoader scene = main.getModelActivity().getScene();
 		if (scene == null) {
-			// scene not ready
+			//
 			return;
 		}
 
 
-		// camera should know about objects that collision with it
+		//
+		//相机知道与之碰撞的物体
 		camera.setScene(scene);
 
-		// animate scene
+		//动画场景
 		scene.onDrawFrame();
 
-		// draw light
+		//
 		if (scene.isDrawLighting()) {
 
 			Object3DImpl lightBulbDrawer = (Object3DImpl) drawer.getPointDrawer();
 
 			float[] lightModelViewMatrix = lightBulbDrawer.getMvMatrix(lightBulbDrawer.getMMatrix(scene.getLightBulb()),modelViewMatrix);
 
-			// Calculate position of the light in eye space to support lighting
+			// 计算眼睛空间中的光线位置以支持照明
 			Matrix.multiplyMV(lightPosInEyeSpace, 0, lightModelViewMatrix, 0, scene.getLightBulb().getPosition(), 0);
 
-			// Draw a point that represents the light bulb
+			//绘制一个代表灯泡的点
 			lightBulbDrawer.draw(scene.getLightBulb(), modelProjectionMatrix, modelViewMatrix, -1, lightPosInEyeSpace);
 		}
 
@@ -185,14 +189,12 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 				if (scene.isDrawWireframe() && objData.getDrawMode() != GLES20.GL_POINTS
 						&& objData.getDrawMode() != GLES20.GL_LINES && objData.getDrawMode() != GLES20.GL_LINE_STRIP
 						&& objData.getDrawMode() != GLES20.GL_LINE_LOOP) {
-					// Log.d("ModelRenderer","Drawing wireframe model...");
+
 					try{
-						// Only draw wireframes for objects having faces (triangles)
+						// 仅绘制具有面（三角形）的对象的线框
 						Object3DData wireframe = wireframes.get(objData);
 						if (wireframe == null || changed) {
 							Log.i("ModelRenderer","Generating wireframe model...");
-//							wireframe = Object3DBuilder.buildWireframe4(objData);
-//							wireframe.centerAndScale(5.0f);
 							wireframe = Object3DBuilder.buildWireframe(objData);
 							wireframes.put(objData, wireframe);
 						}
@@ -210,7 +212,7 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 							textureId != null ? textureId : -1, lightPosInEyeSpace);
 				}
 
-				// Draw bounding box
+				//
 				if (scene.isDrawBoundingBox() || scene.getSelectedObject() == objData) {
 					Object3DData boundingBoxData = boundingBoxes.get(objData);
 					if (boundingBoxData == null || changed) {
@@ -221,13 +223,13 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 					boundingBoxDrawer.draw(boundingBoxData, modelProjectionMatrix, modelViewMatrix, -1, null);
 				}
 
-				// Draw bounding box
+				// 绘制边界框
 				if (scene.isDrawNormals()) {
 					Object3DData normalData = normals.get(objData);
 					if (normalData == null || changed) {
 						normalData = Object3DBuilder.buildFaceNormals(objData);
 						if (normalData != null) {
-							// it can be null if object isnt made of triangles
+							// 如果对象不是由三角形组成，则它可以为null
 							normals.put(objData, normalData);
 						}
 					}
@@ -236,8 +238,7 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 						normalsDrawer.draw(normalData, modelProjectionMatrix, modelViewMatrix, -1, null);
 					}
 				}
-				// TODO: enable this only when user wants it
-				// obj3D.drawVectorNormals(result, modelViewMatrix);
+
 			} catch (IOException ex) {
 				Toast.makeText(main.getModelActivity().getApplicationContext(),
 						"There was a problem creating 3D object", Toast.LENGTH_LONG).show();

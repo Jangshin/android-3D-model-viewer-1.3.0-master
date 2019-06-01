@@ -50,7 +50,7 @@ public class ModelActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// Try to get input parameters
+		//尝试获取输入参数
 		Bundle b = getIntent().getExtras();
 		if (b != null) {
 			this.paramAssetDir = b.getString("assetDir");
@@ -64,7 +64,7 @@ public class ModelActivity extends Activity {
 				backgroundColor[2] = Float.parseFloat(backgroundColors[2]);
 				backgroundColor[3] = Float.parseFloat(backgroundColors[3]);
 			}catch(Exception ex){
-				// Assuming default background color
+				//
 			}
 		}
 		Log.i("Renderer", "Params: assetDir '" + paramAssetDir + "', assetFilename '" + paramAssetFilename + "', uri '"
@@ -72,21 +72,17 @@ public class ModelActivity extends Activity {
 
 		handler = new Handler(getMainLooper());
 
-		// Create a GLSurfaceView instance and set it
-		// as the ContentView for this Activity.
+		// 创建一个GLSurfaceView实例并将其设置为此Activity的ContentView。
 		gLView = new ModelSurfaceView(this);
 		setContentView(gLView);
 
-		// Create our 3D sceneario
+		// 创建3D场景
 		scene = new SceneLoader(this);
 		scene.init();
 
-		// Show the Up button in the action bar.
+		// 在操作栏中显示“向上”按钮。
 		setupActionBar();
 
-		// TODO: Alert user when there is no multitouch support (2 fingers). He won't be able to rotate or zoom for
-		// example
-		//Utils.printTouchCapabilities(getPackageManager());
 
 		setupOnSystemVisibilityChangeListener();
 	}
@@ -116,19 +112,17 @@ public class ModelActivity extends Activity {
 		getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
 			@Override
 			public void onSystemUiVisibilityChange(int visibility) {
-				// Note that system bars will only be "visible" if none of the
-				// LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
+				//请注意，如果未设置LOW_PROFILE，HIDE_NAVIGATION或FULLSCREEN标志，系统栏将仅“可见”。
 				if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
 					// TODO: The system bars are visible. Make any desired
-					// adjustments to your UI, such as showing the action bar or
-					// other navigational controls.
+					// 调整UI，例如显示操作栏或其他导航控件。
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 						hideSystemUIDelayed(3000);
 					}
 				} else {
-					// TODO: The system bars are NOT visible. Make any desired
-					// adjustments to your UI, such as hiding the action bar or
-					// other navigational controls.
+					//
+					//
+					//调整UI，例如隐藏操作栏或其他导航控件。
 				}
 			}
 		});
@@ -170,15 +164,15 @@ public class ModelActivity extends Activity {
 		}
 	}
 
-	// This snippet hides the system bars.
+
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	private void hideSystemUIKitKat() {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
 			return;
 		}
-		// Set the IMMERSIVE flag.
-		// Set the content to appear under the system bars so that the content
-		// doesn't resize when the system bars hide and show.
+		// 设置IMMERSIVE标志。
+		//将内容设置为显示在系统栏下方以便显示内容
+		//当系统栏隐藏和显示时不调整大小
 		final View decorView = getWindow().getDecorView();
 		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
@@ -197,8 +191,9 @@ public class ModelActivity extends Activity {
 				| View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
 	}
 
-	// This snippet shows the system bars. It does this by removing all the flags
-	// except for the ones that make the content appear under the system bars.
+	//
+	//此代码段显示系统栏。它通过删除所有标志来实现此目的
+	//除了使内容出现在系统栏下的那些。
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	private void showSystemUI() {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {

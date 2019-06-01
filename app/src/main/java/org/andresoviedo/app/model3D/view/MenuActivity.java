@@ -31,17 +31,11 @@ public class MenuActivity extends ListActivity {
 				getResources().getStringArray(R.array.menu_items)));
 	}
 	
-	// @Override
-	// public boolean onCreateOptionsMenu(Menu menu) {
-	// // Inflate the menu; this adds items to the action bar if it is present.
-	// getMenuInflater().inflate(R.menu.menu, menu);
-	// return true;
-	// }
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		String selectedItem = (String) getListView().getItemAtPosition(position);
-		// Toast.makeText(getApplicationContext(), "Click ListItem '" + selectedItem + "'", Toast.LENGTH_LONG).show();
+
 		String selectedAction = selectedItem.replace(' ', '_').toUpperCase(Locale.getDefault());
 		try {
 				Intent target = Utils.createGetContentIntent();
@@ -49,7 +43,7 @@ public class MenuActivity extends ListActivity {
 				try {
 					startActivityForResult(intent, REQUEST_CODE_OPEN_FILE);
 				} catch (ActivityNotFoundException e) {
-					// The reason for the existence of aFileChooser
+					//
 				}
 		} catch (Exception ex) {
 			Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
